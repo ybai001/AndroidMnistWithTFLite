@@ -16,6 +16,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 import java.util.ArrayList;
@@ -24,43 +26,38 @@ import java.util.List;
 
 public class KerasTFLite {
 
-
-    private static final int INPUT_SIZE = 28;
-    private static final String INPUT_NAME = "input";
-    private static final String OUTPUT_NAME = "output";
+    private static final int INPUT_IMG_SIZE_WIDTH = 28;
+    private static final int INPUT_IMG_SIZE_HEIGHT = 28;
+    private static final int FLOAT_TYPE_SIZE = 4;
+    private static final int PIXEL_SIZE = 1;
+    private static final int MODEL_INPUT_SIZE = FLOAT_TYPE_SIZE * INPUT_IMG_SIZE_WIDTH * INPUT_IMG_SIZE_HEIGHT * PIXEL_SIZE;
 
     private static final String MODEL_FILE = "keras_mnist_model.tflite";
     private static final String LABEL_FILE = "graph_label_strings.txt";
     private static final String TAG = "KerasMNIST";
-    private final Context mContext;
-    private List<String> mLables;
-    private Interpreter mInterpreter;
-    private float[][] labelProbArray = null;
+    private final List<String> mLables;
+    private final Interpreter mInterpreter;
+    private final float[][] labelProbArray;
 
     public KerasTFLite(Context context) throws IOException {
-        mContext = context;
-        MappedByteBuffer byteBuffer = loadModelFile(mContext);
+        MappedByteBuffer byteBuffer = loadModelFile(context);
         mInterpreter = new Interpreter(byteBuffer);
         //result will be number between 0~9
         labelProbArray = new float[1][10];
-        mLables = loadLabelList(mContext);
+        mLables = loadLabelList(context);
     }
 
     public String run(float[] input){
-
-        mInterpreter.run(input, labelProbArray);
+        ByteBuffer byteBuffer = ByteBuffer.allocateDirect(MODEL_INPUT_SIZE);
+        byteBuffer.order(ByteOrder.nativeOrder());
+        for (float pixel : input) {
+            byteBuffer.putFloat(pixel);
+        }
+        mInterpreter.run(byteBuffer, labelProbArray);
         Log.v(TAG, Arrays.toString(labelProbArray[0]));
         return mLables.get(getMax(labelProbArray[0]));
     }
-//    //Caused by: java.io.FileNotFoundException: This file can not be opened as a file descriptor; it is probably compressed
-//    private MappedByteBuffer loadModelFile(Context context) throws IOException {
-//        AssetFileDescriptor fileDescriptor = context.getAssets().openFd(MODEL_FILE);
-//        FileInputStream inputStream = new FileInputStream(fileDescriptor.getFileDescriptor());
-//        FileChannel fileChannel = inputStream.getChannel();
-//        long startOffset = fileDescriptor.getStartOffset();
-//        long declaredLength = fileDescriptor.getDeclaredLength();
-//        return fileChannel.map(FileChannel.MapMode.READ_ONLY, startOffset, declaredLength);
-//    }
+
     private MappedByteBuffer loadModelFile(Context context) throws IOException {
         String filePath = Environment.getExternalStorageDirectory()+File.separator+MODEL_FILE;
         File file = new File(filePath);
@@ -82,7 +79,7 @@ public class KerasTFLite {
     }
 
     private List<String> loadLabelList(Context context) throws IOException {
-        List<String> labelList = new ArrayList<String>();
+        List<String> labelList = new ArrayList<>();
         BufferedReader reader =
                 new BufferedReader(new InputStreamReader(context.getAssets().open(LABEL_FILE)));
         String line;

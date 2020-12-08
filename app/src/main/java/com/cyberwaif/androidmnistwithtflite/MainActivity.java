@@ -1,6 +1,7 @@
 package com.cyberwaif.androidmnistwithtflite;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.graphics.PointF;
 import android.os.Bundle;
@@ -9,7 +10,6 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.TextView;
 
-import com.cyberwaif.androidmnistwithtflite.R;
 import com.cyberwaif.androidmnistwithtflite.view.DrawModel;
 import com.cyberwaif.androidmnistwithtflite.view.DrawView;
 import com.cyberwaif.utils.PermissionsUtil;
@@ -28,7 +28,6 @@ public class MainActivity extends Activity implements View.OnTouchListener {
     private TextView mResultText;
 
     private float mLastX;
-
     private float mLastY;
 
     private DrawModel mModel;
@@ -36,11 +35,12 @@ public class MainActivity extends Activity implements View.OnTouchListener {
 
     private View detectButton;
 
-    private PointF mTmpPoint = new PointF();
+    private final PointF mTmpPoint = new PointF();
 
-    private Executor executor = Executors.newSingleThreadExecutor();
+    private final Executor executor = Executors.newSingleThreadExecutor();
     private KerasTFLite mTFLite;
 
+    @SuppressLint("ClickableViewAccessibility")
     @SuppressWarnings("SuspiciousNameCombination")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -117,6 +117,7 @@ public class MainActivity extends Activity implements View.OnTouchListener {
         super.onPause();
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     @Override
     public boolean onTouch(View v, MotionEvent event) {
         int action = event.getAction() & MotionEvent.ACTION_MASK;
@@ -164,15 +165,15 @@ public class MainActivity extends Activity implements View.OnTouchListener {
     }
 
     private void onDetectClicked() {
-        float pixels[] = mDrawView.getPixelData();
+        float[] pixels = mDrawView.getPixelData();
 
         //should be same format with train
         for(int i = 0; i < pixels.length; i++){
-            pixels[i] = pixels[i]/255;
+            pixels[i] = pixels[i] / 255 - (float)0.5;
         }
 
-        for(int i = 0; i<28; i++){
-            float[] a = Arrays.copyOfRange(pixels, i*28, i*28+28);
+        for(int i = 0; i < 28; i++){
+            float[] a = Arrays.copyOfRange(pixels, i * 28, i * 28 + 28);
             Log.v(TAG,  Arrays.toString(a));
         }
 

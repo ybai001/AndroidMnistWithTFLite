@@ -2,4 +2,5 @@
     <string name="app_name">MNIST with TFLite</string>
     <string name="clear">Clear</string>
     <string name="detect">Detect</string>
+    <color name="bg_color">#333333</color>
 </resources>

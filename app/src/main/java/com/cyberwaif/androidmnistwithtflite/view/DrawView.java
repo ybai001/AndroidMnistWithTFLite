@@ -32,18 +32,18 @@ import android.view.View;
  */
 
 public class DrawView extends View {
-    private Paint mPaint = new Paint();
+    private final Paint mPaint = new Paint();
     private DrawModel mModel;
     // 28x28 pixel Bitmap
     private Bitmap mOffscreenBitmap;
     private Canvas mOffscreenCanvas;
 
-    private Matrix mMatrix = new Matrix();
-    private Matrix mInvMatrix = new Matrix();
+    private final Matrix mMatrix = new Matrix();
+    private final Matrix mInvMatrix = new Matrix();
     private int mDrawnLineSize = 0;
     private boolean mSetuped = false;
 
-    private float mTmpPoints[] = new float[2];
+    private final float[] mTmpPoints = new float[2];
 
     public DrawView(Context context, AttributeSet attrs) {
         super(context, attrs);
