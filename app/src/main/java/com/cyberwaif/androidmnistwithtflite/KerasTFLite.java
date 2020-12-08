@@ -35,19 +35,20 @@ public class KerasTFLite {
     private static final String MODEL_FILE = "keras_mnist_model.tflite";
     private static final String LABEL_FILE = "graph_label_strings.txt";
     private static final String TAG = "KerasMNIST";
-    private final List<String> mLables;
+    private final List<String> mLabels;
     private final Interpreter mInterpreter;
     private final float[][] labelProbArray;
+    private final String[] mResultStr = new String[]{"",""};
 
     public KerasTFLite(Context context) throws IOException {
         MappedByteBuffer byteBuffer = loadModelFile(context);
         mInterpreter = new Interpreter(byteBuffer);
         //result will be number between 0~9
         labelProbArray = new float[1][10];
-        mLables = loadLabelList(context);
+        mLabels = loadLabelList(context);
     }
 
-    public String run(float[] input){
+    public String[] run(float[] input){
         ByteBuffer byteBuffer = ByteBuffer.allocateDirect(MODEL_INPUT_SIZE);
         byteBuffer.order(ByteOrder.nativeOrder());
         for (float pixel : input) {
@@ -55,7 +56,10 @@ public class KerasTFLite {
         }
         mInterpreter.run(byteBuffer, labelProbArray);
         Log.v(TAG, Arrays.toString(labelProbArray[0]));
-        return mLables.get(getMax(labelProbArray[0]));
+        mResultStr[0] = mLabels.get(getMax(labelProbArray[0]));
+        int index = getMax(labelProbArray[0]);
+        mResultStr[1] = String.valueOf(labelProbArray[0][index]);
+        return mResultStr;
     }
 
     private MappedByteBuffer loadModelFile(Context context) throws IOException {

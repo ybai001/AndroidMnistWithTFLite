@@ -26,6 +26,7 @@ public class MainActivity extends Activity implements View.OnTouchListener {
     private static final int PIXEL_WIDTH = 28;
 
     private TextView mResultText;
+    private TextView mResultPosText;
 
     private float mLastX;
     private float mLastY;
@@ -70,7 +71,7 @@ public class MainActivity extends Activity implements View.OnTouchListener {
         });
 
         mResultText = (TextView) findViewById(R.id.textResult);
-
+        mResultPosText = (TextView) findViewById(R.id.textPosResult);
         PermissionsUtil.checkCriticalPerms(this);
     }
 
@@ -177,11 +178,12 @@ public class MainActivity extends Activity implements View.OnTouchListener {
             Log.v(TAG,  Arrays.toString(a));
         }
 
-        String result = mTFLite.run(pixels);
+        String[] result = mTFLite.run(pixels);
 
-        String value = " Number is : "+result;
+        String value = " Number is : " + result[0];
+        String posValue = "Possibility is : " + result[1];
         mResultText.setText(value);
-
+        mResultPosText.setText(posValue);
     }
 
     private void onClearClicked() {
@@ -190,6 +192,7 @@ public class MainActivity extends Activity implements View.OnTouchListener {
         mDrawView.invalidate();
 
         mResultText.setText("");
+        mResultPosText.setText("");
     }
 
     @Override
