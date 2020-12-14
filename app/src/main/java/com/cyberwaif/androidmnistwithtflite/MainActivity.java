@@ -178,10 +178,13 @@ public class MainActivity extends Activity implements View.OnTouchListener {
             Log.v(TAG,  Arrays.toString(a));
         }
 
+        long startTime = System.currentTimeMillis();
         String[] result = mTFLite.run(pixels);
+        long timeDuration = System.currentTimeMillis() - startTime;
 
         String value = " Number is : " + result[0];
-        String posValue = "Possibility is : " + result[1];
+        String posValue = "Possibility is : " + result[1] + "\n"
+                + "Calculation time is : " + timeDuration + "ms";
         mResultText.setText(value);
         mResultPosText.setText(posValue);
     }
