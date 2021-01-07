@@ -2,11 +2,13 @@ package com.cyberwaif.androidmnistwithtflite;
 
 import android.content.Context;
 import android.content.res.AssetManager;
+import android.os.Build;
 import android.os.Environment;
 import android.util.Log;
 
-import org.tensorflow.lite.Interpreter;
 import org.tensorflow.lite.gpu.GpuDelegate;
+import org.tensorflow.lite.Interpreter;
+import org.tensorflow.lite.nnapi.NnApiDelegate;
 
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
@@ -43,6 +45,13 @@ public class KerasTFLite {
 
     public KerasTFLite(Context context) throws IOException {
         MappedByteBuffer byteBuffer = loadModelFile(context);
+        //NnApiDelegate nnApiDelegate = null;
+        //Interpreter.Options options = null;
+        //// Initialize interpreter with NNAPI delegate for Android Pie or above
+        //if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+        //    nnApiDelegate = new NnApiDelegate();
+        //    options = (new Interpreter.Options()).addDelegate(nnApiDelegate);
+        //}
         GpuDelegate delegate = new GpuDelegate();
         Interpreter.Options options = (new Interpreter.Options()).addDelegate(delegate);
         mInterpreter = new Interpreter(byteBuffer, options);
