@@ -6,6 +6,7 @@ import android.os.Environment;
 import android.util.Log;
 
 import org.tensorflow.lite.Interpreter;
+import org.tensorflow.lite.gpu.GpuDelegate;
 
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
@@ -42,7 +43,9 @@ public class KerasTFLite {
 
     public KerasTFLite(Context context) throws IOException {
         MappedByteBuffer byteBuffer = loadModelFile(context);
-        mInterpreter = new Interpreter(byteBuffer);
+        GpuDelegate delegate = new GpuDelegate();
+        Interpreter.Options options = (new Interpreter.Options()).addDelegate(delegate);
+        mInterpreter = new Interpreter(byteBuffer, options);
         //result will be number between 0~9
         labelProbArray = new float[1][10];
         mLabels = loadLabelList(context);
